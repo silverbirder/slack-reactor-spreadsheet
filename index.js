@@ -5,11 +5,16 @@ function doPost(e){
   if (event.type === "reaction_added" && event.reaction === "link") {
     var spreadsheet = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty("SPREDSHEET_ID"));
     var listSheet = spreadsheet.getSheetByName('list');
-    var LastRow = listSheet.getRange('B:B').getValues().filter(String).length + 1;
+    var LastRow = listSheet.getRange('B:B').getValues().filter(String).length + 2;
     var menteeSheet = spreadsheet.getSheetByName('mentee');
+    var channelCell = menteeSheet.createTextFinder(event.item.channel).findAll()[0].getA1Notation(); // b19
+    var userCell = "A" + channelCell.slice(1);
+    var userName = menteeSheet.getRange(userCell).getValue();
     var d = new Date(event.item.ts * 1000);
     var link = `https://mentasilverbirder.slack.com/archives/${event.item.channel}/p${String(event.item.ts).replace(".", "")}`
-    listSheet.getRange("B9").setValue(`${getNowYMD(d)}`);
+    listSheet.getRange("B" + LastRow).setValue(`${getNowYMD(d)}`);
+    listSheet.getRange("C" + LastRow).setValue(link);
+    listSheet.getRange("D" + LastRow).setValue(userName);
   }
   return ContentService.createTextOutput(params.challenge);
 }
